@@ -7,7 +7,7 @@
  *
  ***********************************************************************
  *  This file is part of UUGear Solution: 
- *  http://www.uugear.com/?page_id=50
+ *  http://www.uugear.com/uugear-rpi-arduino-solution/
  *  
  *  UUGear Solution is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
@@ -23,6 +23,9 @@
  *  along with UUGear Solution.  If not, see <http://www.gnu.org/licenses/>.
  *
  ***********************************************************************
+ * 
+ * Quick test: after uploading the sketch, send "U01" with both NL and CR in
+ * the serial monitor, you should be able to see the 1 + {device id} + :)
  */
 #include <EEPROM.h>
 
@@ -30,7 +33,7 @@
 
 #define EEPROM_SIZE  1024
 
-#define ID_PREFIX  "UUGear-Arduino-Nano-"
+#define ID_PREFIX  "UUGear-Arduino-"
 
 #define COMMAND_START_CHAR  'U'
 #define COMMAND_END_STRING  "\r\n"
@@ -43,9 +46,9 @@ int cmdEndStrLen = strlen(COMMAND_END_STRING);
 
 void setup() {
   // if has no id yet, generate one
-  if (getID() == "") {
+  //if (getID() == "") {
     generateID();
-  }
+  //}
   
   // initialize serial port
   Serial.begin(BAUD_RATE);

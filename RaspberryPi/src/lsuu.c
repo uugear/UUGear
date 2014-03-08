@@ -36,7 +36,8 @@
 #include "serial.h"
 
 
-#define UUGEAR_DEVICE_PREFIX		"ttyUSB"
+#define UUGEAR_DEVICE_PREFIX1		"ttyUSB"
+#define UUGEAR_DEVICE_PREFIX2		"ttyACM"
 #define UUGEAR_DEVICE_BAUD_RATE		115200
 #define UUGEAR_ID_PREFIX			"UUGear-"
 #define UUGEAR_ID_MAX_LENGTH		1024
@@ -138,7 +139,7 @@ int main(int argc, char **argv)
 		{
 			if (dir->d_type == DT_CHR)
   			{
-  				if (startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX))
+  				if (startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX1) || startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX2))
   				{
   					if (openDevice(dir))
   					{

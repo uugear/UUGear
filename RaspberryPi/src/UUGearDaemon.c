@@ -310,7 +310,7 @@ void openDeviceById(int clientId, char *id)
 		{
 			if (dir->d_type == DT_CHR)
   			{
-  				if (startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX))
+  				if (startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX1) || startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX2))
   				{
   					// open the device for id query
 					char devicePath[32];
