@@ -355,6 +355,13 @@ void sendCommand(char cmd, int clientId, int targetFd, int pin)
 	serialWriteString (targetFd, command);
 }
 
+void sendCommandWithParameter(char cmd, int clientId, int targetFd, int pin, int parameter)
+{
+	syslog (LOG_INFO, "Send command: cmd=0x%02x, clientId=%d, fd=%d, pin=%d, parameter=%d", cmd, clientId, targetFd, pin, parameter);
+	char command[] = { COMMAND_START_CHAR, cmd, (char)(pin & 0xFF), (char)(parameter & 0xFF), (char)(clientId & 0xFF), COMMAND_END_CHAR1, COMMAND_END_CHAR2, 0x00 };
+	serialWriteString (targetFd, command);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -402,8 +409,8 @@ int main(int argc, char **argv)
 			if (count > 0)
 			{
 				int cmd = atoi (parts[0]);
-				int clientId = count > 1 ? (atoi (parts[1]) % 255) : -1;
-				int targetFd = count > 2 ? (atoi (parts[2]) % 255) : -1;
+				int clientId = count > 1 ? (atoi (parts[1]) & 0xFF) : -1;
+				int targetFd = count > 2 ? (atoi (parts[2]) & 0xFF) : -1;
 				switch (cmd)
 				{
 					case MSG_EXIT:
@@ -417,19 +424,24 @@ int main(int argc, char **argv)
 						clientStatus[clientId] = 0;
 						break;
 					case MSG_SET_PIN_OUTPUT:
-						sendCommand(CMD_SET_PIN_OUTPUT, clientId, targetFd, count > 3 ? (atoi (parts[3]) % 255) : -1);
+						sendCommand(CMD_SET_PIN_OUTPUT, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
 					case MSG_SET_PIN_INPUT:
-						sendCommand(CMD_SET_PIN_INPUT, clientId, targetFd, count > 3 ? (atoi (parts[3]) % 255) : -1);
+						sendCommand(CMD_SET_PIN_INPUT, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
 					case MSG_SET_PIN_HIGH:
-						sendCommand(CMD_SET_PIN_HIGH, clientId, targetFd, count > 3 ? (atoi (parts[3]) % 255) : -1);
+						sendCommand(CMD_SET_PIN_HIGH, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
 					case MSG_SET_PIN_LOW:
-						sendCommand(CMD_SET_PIN_LOW, clientId, targetFd, count > 3 ? (atoi (parts[3]) % 255) : -1);
+						sendCommand(CMD_SET_PIN_LOW, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
 					case MSG_GET_PIN_STATUS:
-						sendCommand(CMD_GET_PIN_STATUS, clientId, targetFd, count > 3 ? (atoi (parts[3]) % 255) : -1);
+						sendCommand(CMD_GET_PIN_STATUS, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
+					case MSG_ANALOG_WRITE:
+						sendCommandWithParameter(CMD_ANALOG_WRITE, clientId, targetFd,
+							count > 3 ? (atoi (parts[3]) & 0xFF) : -1,
+							count > 4 ? (atoi (parts[4]) & 0xFF) : -1);
 						break;
 				}
 			}

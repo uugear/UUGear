@@ -189,6 +189,12 @@ void sendMessage(mqd_t in, int msgType, int clientId, int fd, int pin)
 	ASSERT_TRUE (0 <= mq_send (in, buffer, strlen (buffer), 0));
 }
 
+void sendMessageWithParameter(mqd_t in, int msgType, int clientId, int fd, int pin, int parameter)
+{
+	char buffer[MAX_MSG_SIZE + 1];
+	sprintf (buffer,"%d%s%d%s%d%s%d%s%d", msgType, MSG_PART_SEPARATOR, clientId, MSG_PART_SEPARATOR, fd, MSG_PART_SEPARATOR, pin, MSG_PART_SEPARATOR, parameter);
+	ASSERT_TRUE (0 <= mq_send (in, buffer, strlen (buffer), 0));
+}
 
 void setPinModeAsOutput(UUGearDevice *dev, int pin)
 {
@@ -242,6 +248,11 @@ int getPinStatus(UUGearDevice *dev, int pin)
 		return atoi (buffer);
     }
 	return -1;
+}
+
+
+void analogWrite(UUGearDevice *dev, int pin, int value) {
+	sendMessageWithParameter(dev->in, MSG_ANALOG_WRITE, dev->clientId, dev->fd, pin, value);
 }
 
 

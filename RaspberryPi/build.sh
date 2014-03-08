@@ -28,6 +28,8 @@ cd $EXAMPLE_DIR
 
 cc -L$TARGET_DIR -Wall test.c -o $TARGET_DIR/test -lUUGear -lrt
 
+cc -L$TARGET_DIR -Wall AnalogWrite.c -o $TARGET_DIR/AnalogWrite -lUUGear -lrt
+
 cd $CURRENT_DIR
 
 echo "Build End"

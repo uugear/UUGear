@@ -53,6 +53,8 @@ extern void setPinLow(UUGearDevice *dev, int pin);
 
 extern int getPinStatus(UUGearDevice *dev, int pin);
 
+extern void analogWrite(UUGearDevice *dev, int pin, int value);
+
 extern void detachUUGearDevice (UUGearDevice *dev);
 
 extern void cleanupUUGear ();

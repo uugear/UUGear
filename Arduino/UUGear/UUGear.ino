@@ -46,9 +46,9 @@ int cmdEndStrLen = strlen(COMMAND_END_STRING);
 
 void setup() {
   // if has no id yet, generate one
-  //if (getID() == "") {
+  if (getID() == "") {
     generateID();
-  //}
+  }
   
   // initialize serial port
   Serial.begin(BAUD_RATE);
@@ -150,6 +150,9 @@ void processCommand(String cmd) {
       case 0x35:
         cmdGetPinStatus(cmd);
         break;
+      case 0x36:
+        cmdAnalogWrite(cmd);
+        break;
     }
   }
 }
@@ -212,5 +215,15 @@ void cmdGetPinStatus(String cmd) {
     Serial.write((byte)clientId);
     Serial.print(String(digitalRead(pin)));
     Serial.print(RESPONSE_END_STRING);
+  }
+}
+
+// command to write analog value
+// example: 55 36 09 70 0D 0A
+void cmdAnalogWrite(String cmd) {
+  if (cmd.length() > 5) {
+    char pin = cmd.charAt(2);
+    char value = cmd.charAt(3);
+    analogWrite(pin, value);
   }
 }
