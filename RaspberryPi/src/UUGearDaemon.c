@@ -443,6 +443,9 @@ int main(int argc, char **argv)
 							count > 3 ? (atoi (parts[3]) & 0xFF) : -1,
 							count > 4 ? (atoi (parts[4]) & 0xFF) : -1);
 						break;
+					case MSG_ANALOG_READ:
+						sendCommand(CMD_ANALOG_READ, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
 				}
 			}
         }

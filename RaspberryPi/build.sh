@@ -30,6 +30,8 @@ cc -L$TARGET_DIR -Wall test.c -o $TARGET_DIR/test -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall AnalogWrite.c -o $TARGET_DIR/AnalogWrite -lUUGear -lrt
 
+cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -lUUGear -lrt
+
 cd $CURRENT_DIR
 
 echo "Build End"

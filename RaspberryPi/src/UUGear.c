@@ -256,6 +256,37 @@ void analogWrite(UUGearDevice *dev, int pin, int value) {
 }
 
 
+int analogRead(UUGearDevice *dev, int pin)
+{
+	sendMessage(dev->in, MSG_ANALOG_READ, dev->clientId, dev->fd, pin);
+	
+	/* wait for the response */
+	char buffer[MAX_MSG_SIZE + 1];
+	int bytes = 0;
+	struct timespec ts;
+    ts.tv_sec = time(0) + 2;
+    ts.tv_nsec = 0;
+    
+	if ((bytes = mq_timedreceive (dev->out, buffer, MAX_MSG_SIZE, NULL, &ts)) == -1)
+    {
+        if (errno == ETIMEDOUT)
+        {
+        	printLog ("No analog value returned before timeout.\n");
+        }
+        else
+        {
+        	printLog ("Can not read analog value from pin. Error=%d.\n", errno);
+        }
+    }
+    else
+    {
+    	buffer[bytes] = 0;
+		return atoi (buffer);
+    }
+	return -1;
+}
+
+
 void detachUUGearDevice (UUGearDevice *dev)
 {
 	char buffer[MAX_MSG_SIZE + 1];

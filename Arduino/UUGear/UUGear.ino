@@ -153,6 +153,9 @@ void processCommand(String cmd) {
       case 0x36:
         cmdAnalogWrite(cmd);
         break;
+      case 0x37:
+        cmdAnalogRead(cmd);
+        break;
     }
   }
 }
@@ -225,5 +228,18 @@ void cmdAnalogWrite(String cmd) {
     char pin = cmd.charAt(2);
     char value = cmd.charAt(3);
     analogWrite(pin, value);
+  }
+}
+
+// command to read analog value
+// example: 55 37 09 01 0D 0A
+void cmdAnalogRead(String cmd) {
+  if (cmd.length() > 5) {
+    char pin = cmd.charAt(2);
+    char clientId = cmd.charAt(3);
+    Serial.write(RESPONSE_START_CHAR);
+    Serial.write((byte)clientId);
+    Serial.print(String(analogRead(pin)));
+    Serial.print(RESPONSE_END_STRING);
   }
 }
