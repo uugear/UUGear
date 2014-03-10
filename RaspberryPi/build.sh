@@ -32,6 +32,8 @@ cc -L$TARGET_DIR -Wall AnalogWrite.c -o $TARGET_DIR/AnalogWrite -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -lUUGear -lrt
 
+cc -L$TARGET_DIR -Wall ReadSpeed.c -o $TARGET_DIR/ReadSpeed -lUUGear -lrt
+
 cd $CURRENT_DIR
 
 echo "Build End"

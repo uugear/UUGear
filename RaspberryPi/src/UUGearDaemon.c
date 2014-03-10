@@ -154,6 +154,18 @@ int startsWith(const char *str, const char *pre)
 }
 
 
+int endsWith(const char *str, const char *suffix)
+{
+    if (!str || !suffix)
+        return 0;
+    size_t lenstr = strlen(str);
+    size_t lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr)
+        return 0;
+    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+}
+
+
 void responseToClient(int clientId, char *resp)
 {
 	char queueName[MAX_QUEUE_NAME_LENGTH];
@@ -195,6 +207,10 @@ void *deviceOpener(void *arg)
 			else
 			{
 				buf[j ++] = (chr & 0xFF);
+				if (endsWith (buf, UUGEAR_RESPONSE_END_STRING))
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -250,6 +266,10 @@ void *deviceOpener(void *arg)
 							else
 							{
 								buf[k ++] = (chr & 0xFF);
+								if (endsWith (buf, UUGEAR_RESPONSE_END_STRING))
+								{
+									break;
+								}
 							}
 						}
 					}
