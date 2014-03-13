@@ -20,13 +20,15 @@ cc -shared -o $TARGET_DIR/libUUGear.so $TARGET_DIR/UUGear.o -lrt
 
 cc -o $TARGET_DIR/lsuu lsuu.c serial.c
 
-echo "Building example..."
+cp UUGear.py $TARGET_DIR/UUGear.py
 
-EXAMPLE_DIR=$CURRENT_DIR/example
+echo "Building examples in C..."
+
+EXAMPLE_DIR=$CURRENT_DIR/example/c
 
 cd $EXAMPLE_DIR
 
-cc -L$TARGET_DIR -Wall test.c -o $TARGET_DIR/test -lUUGear -lrt
+cc -L$TARGET_DIR -Wall DigitalReadWrite.c -o $TARGET_DIR/DigitalReadWrite -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall AnalogWrite.c -o $TARGET_DIR/AnalogWrite -lUUGear -lrt
 
@@ -35,5 +37,9 @@ cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -l
 cc -L$TARGET_DIR -Wall ReadSpeed.c -o $TARGET_DIR/ReadSpeed -lUUGear -lrt
 
 cd $CURRENT_DIR
+
+echo "Copying examples in Python..."
+
+cp $CURRENT_DIR/example/python/*.py $TARGET_DIR
 
 echo "Build End"

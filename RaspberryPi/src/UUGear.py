@@ -60,6 +60,12 @@ uugearlib.setPinModeAsInput.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 uugearlib.getPinStatus.restype = c_int
 uugearlib.getPinStatus.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
+uugearlib.analogWrite.restype = None
+uugearlib.analogWrite.argtypes = [POINTER(UUGearDeviceProfile), c_int, c_int]
+
+uugearlib.analogRead.restype = c_int
+uugearlib.analogRead.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
 uugearlib.detachUUGearDevice.restype = None
 uugearlib.detachUUGearDevice.argtypes = [POINTER(UUGearDeviceProfile)]
 
@@ -106,5 +112,15 @@ class UUGearDevice(object):
 	def getPinStatus(self, pin):
 		if self.isValid():
 			return uugearlib.getPinStatus(byref(self.devProfile), pin)
+		else:
+			return -1
+
+	def analogWrite(self, pin, value):
+		if self.isValid():
+			uugearlib.analogWrite(byref(self.devProfile), pin, value)
+			
+	def analogRead(self, pin):
+		if self.isValid():
+			return uugearlib.analogRead(byref(self.devProfile), pin)
 		else:
 			return -1

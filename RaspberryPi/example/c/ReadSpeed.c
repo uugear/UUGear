@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "../src/UUGear.h"
+#include "../../src/UUGear.h"
 
 
 double getCurTime()

@@ -6,7 +6,7 @@
 #include <mqueue.h>
 #include <unistd.h>
 
-#include "../src/UUGear.h"
+#include "../../src/UUGear.h"
 
 int main(int argc, char **argv)
 {
@@ -18,26 +18,24 @@ int main(int argc, char **argv)
 	
 	if (dev.fd != -1)
 	{
-		int pins[] = {3, 6, 9};
-		int values[] = {96, 64, 32};
-		int deltas[] = {4, 4, 4};
+		setPinModeAsOutput (&dev, 13);
+		int i = 0;
+		for (i = 0; i < 5; i ++)
+		{
+			setPinHigh (&dev, 13);
+			
+			usleep(200000);
+			
+			setPinLow (&dev, 13);
 		
-		int i, j;
-		for (i = 0; i < 2560; i ++) {
-			for (j = 0; j < 3; j ++) {
-				values[j] += deltas[j];
-				if (deltas[j] > 0)
-				{
-					deltas[j] *= (values[j] < 150) ? 1 : -1;
-				}
-				else
-				{
-					deltas[j] *= (values[j] > 5) ? 1 : -1;
-				}
-				analogWrite (&dev, pins[j], values[j]);
-			}
-			usleep(50000);
+			usleep(200000);
 		}
+		
+		setPinModeAsInput (&dev, 9);
+		
+		printf("Pin 9 status=%d\n", getPinStatus(&dev, 9));
+		
+		sleep(1);
 		
 		detachUUGearDevice (&dev);
 	}

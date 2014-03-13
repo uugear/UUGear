@@ -6,7 +6,7 @@
 #include <mqueue.h>
 #include <unistd.h>
 
-#include "../src/UUGear.h"
+#include "../../src/UUGear.h"
 
 int main(int argc, char **argv)
 {
@@ -22,14 +22,14 @@ int main(int argc, char **argv)
 		
 		int i, value;
 		float voltage;
-		for (i = 0; i < 256; i ++) {
+		for (i = 0; i < 100; i ++) {
 			value = analogRead(&dev, pin);
 			
 			voltage = (float)(value * 5) / 1024;
 			
 			printf("%.2fV\n", voltage);	
 			
-			usleep(500);
+			usleep(200000);
 		}
 		
 		detachUUGearDevice (&dev);
