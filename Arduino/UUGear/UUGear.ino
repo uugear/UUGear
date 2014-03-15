@@ -49,7 +49,7 @@ void setup() {
   if (getID() == "") {
     generateID();
   }
-  
+
   // initialize serial port
   Serial.begin(BAUD_RATE);
   while (!Serial) {
@@ -69,7 +69,8 @@ void loop() {
       int pos = cmdBuf.indexOf(COMMAND_START_CHAR);
       if (pos != -1) {
         cmdBuf = cmdBuf.substring(pos);
-      } else {
+      } 
+      else {
         cmdBuf = "";
       }
     }
@@ -77,9 +78,9 @@ void loop() {
     if (cmdBuf != "") {
       int pos = cmdBuf.indexOf(COMMAND_END_STRING);
       if (pos != -1) {
-          String cmd = cmdBuf.substring(0, pos + cmdEndStrLen);
-          cmdBuf = cmdBuf.substring(pos + cmdEndStrLen);
-          processCommand(cmd);
+        String cmd = cmdBuf.substring(0, pos + cmdEndStrLen);
+        cmdBuf = cmdBuf.substring(pos + cmdEndStrLen);
+        processCommand(cmd);
       }
     }
   }
@@ -112,50 +113,52 @@ void generateID() {
 
 // log string to serial, with hex format
 void logAsHex(String str) {
-    String hex = "";
-    int len = str.length();
-    for (int i = 0; i < len; i ++) {
-      int val = str.charAt(i);
-      if (val < 16) {
-        hex += "0";
-      }
-      hex += String(val, HEX);
-      hex += " ";
+  String hex = "";
+  int len = str.length();
+  for (int i = 0; i < len; i ++) {
+    int val = str.charAt(i);
+    if (val < 16) {
+      hex += "0";
     }
-    hex.toUpperCase();
-    Serial.println(hex);
+    hex += String(val, HEX);
+    hex += " ";
+  }
+  hex.toUpperCase();
+  Serial.println(hex);
 }
 
 // process the command
 void processCommand(String cmd) {
   //logAsHex(cmd);
   if (cmd.length() > 3) {
-    char cmdId = cmd.charAt(1);
+    byte cmdId = cmd.charAt(1);
     switch(cmdId) {
-      case 0x30:
-        cmdGetID(cmd);
-        break;
-      case 0x31:
-        cmdPinModeOutput(cmd);
-        break;
-      case 0x32:
-        cmdPinModeInput(cmd);
-        break;
-      case 0x33:
-        cmdSetPinUp(cmd);
-        break;
-      case 0x34:
-        cmdSetPinDown(cmd);
-        break;
-      case 0x35:
-        cmdGetPinStatus(cmd);
-        break;
-      case 0x36:
-        cmdAnalogWrite(cmd);
-        break;
-      case 0x37:
-        cmdAnalogRead(cmd);
-        break;
+    case 0x30:
+      cmdGetID(cmd);
+      break;
+    case 0x31:
+      cmdPinModeOutput(cmd);
+      break;
+    case 0x32:
+      cmdPinModeInput(cmd);
+      break;
+    case 0x33:
+      cmdSetPinUp(cmd);
+      break;
+    case 0x34:
+      cmdSetPinDown(cmd);
+      break;
+    case 0x35:
+      cmdGetPinStatus(cmd);
+      break;
+    case 0x36:
+      cmdAnalogWrite(cmd);
+      break;
+    case 0x37:
+      cmdAnalogRead(cmd);
+      break;
+    case 0x50:
+      cmdReadDHT11(cmd);
     }
   }
 }
@@ -164,9 +167,9 @@ void processCommand(String cmd) {
 // example: 55 30 01 0D 0A
 void cmdGetID(String cmd) {
   if (cmd.length() > 4) {
-    char clientId = cmd.charAt(2);
+    byte clientId = cmd.charAt(2);
     Serial.write(RESPONSE_START_CHAR);
-    Serial.write((byte)clientId);
+    Serial.write(clientId);
     Serial.print(getID());
     Serial.print(RESPONSE_END_STRING);
   }
@@ -176,7 +179,7 @@ void cmdGetID(String cmd) {
 // example: 55 31 09 0D 0A
 void cmdPinModeOutput(String cmd) {
   if (cmd.length() > 4) {
-    char pin = cmd.charAt(2);
+    byte pin = cmd.charAt(2);
     pinMode(pin, OUTPUT);
   }
 }
@@ -185,7 +188,7 @@ void cmdPinModeOutput(String cmd) {
 // example: 55 32 09 0D 0A
 void cmdPinModeInput(String cmd) {
   if (cmd.length() > 4) {
-    char pin = cmd.charAt(2);
+    byte pin = cmd.charAt(2);
     pinMode(pin, INPUT);
   }
 }
@@ -194,7 +197,7 @@ void cmdPinModeInput(String cmd) {
 // example: 55 33 09 0D 0A
 void cmdSetPinUp(String cmd) {
   if (cmd.length() > 4) {
-    char pin = cmd.charAt(2);
+    byte pin = cmd.charAt(2);
     digitalWrite(pin, HIGH);
   }
 }
@@ -203,7 +206,7 @@ void cmdSetPinUp(String cmd) {
 // example: 55 34 09 0D 0A
 void cmdSetPinDown(String cmd) {
   if (cmd.length() > 4) {
-    char pin = cmd.charAt(2);
+    byte pin = cmd.charAt(2);
     digitalWrite(pin, LOW);
   }
 }
@@ -212,10 +215,10 @@ void cmdSetPinDown(String cmd) {
 // example: 55 35 09 01 0D 0A
 void cmdGetPinStatus(String cmd) {
   if (cmd.length() > 5) {
-    char pin = cmd.charAt(2);
-    char clientId = cmd.charAt(3);    
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);    
     Serial.write(RESPONSE_START_CHAR);
-    Serial.write((byte)clientId);
+    Serial.write(clientId);
     Serial.print(String(digitalRead(pin)));
     Serial.print(RESPONSE_END_STRING);
   }
@@ -225,8 +228,8 @@ void cmdGetPinStatus(String cmd) {
 // example: 55 36 09 70 0D 0A
 void cmdAnalogWrite(String cmd) {
   if (cmd.length() > 5) {
-    char pin = cmd.charAt(2);
-    char value = cmd.charAt(3);
+    byte pin = cmd.charAt(2);
+    byte value = cmd.charAt(3);
     analogWrite(pin, value);
   }
 }
@@ -235,11 +238,88 @@ void cmdAnalogWrite(String cmd) {
 // example: 55 37 09 01 0D 0A
 void cmdAnalogRead(String cmd) {
   if (cmd.length() > 5) {
-    char pin = cmd.charAt(2);
-    char clientId = cmd.charAt(3);
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);
     Serial.write(RESPONSE_START_CHAR);
-    Serial.write((byte)clientId);
+    Serial.write(clientId);
     Serial.print(String(analogRead(pin)));
     Serial.print(RESPONSE_END_STRING);
   }
 }
+
+// command to read DHT11 sensor
+// example: 55 50 04 01 0D 0A
+void cmdReadDHT11(String cmd) {
+  if (cmd.length() > 5) {
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);
+
+    // pull down 18ms as start signal
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+    delay(18);
+
+    // pull up to receive data
+    pinMode(pin, INPUT);
+    digitalWrite(pin, HIGH);
+
+    // now let's read 3 + 40 * 2 edges
+    // first 3 edges are falling, raising and falling, as start
+    // the following 80 edges are raising and falling, repeat 40 times, as 40 bits
+    // none of the edges should let you wait longer than 80us
+    unsigned long startTime;
+    word rawHumidity;
+    word rawTemperature;
+    word data;
+    for (char i = -3; i < 80; i ++) {
+      byte age = 0;
+      startTime = micros();
+      // wait until expected edge shows up, response -1 for timeout
+      while (digitalRead(pin) == (i & 1) ? HIGH : LOW) {
+        age = micros() - startTime;
+        if (age > 80) {
+          Serial.write(RESPONSE_START_CHAR);
+          Serial.write(clientId);
+          Serial.print("-1");
+          Serial.print(RESPONSE_END_STRING);
+          return;
+        }
+      }
+      // save the bit (zero bit never be longer than 30us)
+      if (i >= 0 && (i & 1)) {
+        data <<= 1;
+        if (age > 30) {
+          data |= 1;
+        }
+      }
+      // save the raw humidity and raw temperature
+      if (i == 31) {
+        rawHumidity = data;
+      } 
+      else if (i == 63) {
+        rawTemperature = data;
+        data = 0;
+      }
+    }
+
+    // verify the checksum, response -2 for failure
+    byte humidity = rawHumidity >> 8;
+    byte temperature = rawTemperature >> 8;
+    if ((byte)(((byte)rawHumidity) + humidity + ((byte)rawTemperature) + temperature) != data) {
+      Serial.write(RESPONSE_START_CHAR);
+      Serial.write(clientId);
+      Serial.print("-2");
+      Serial.print(RESPONSE_END_STRING);
+      return;
+    }
+
+    // response with the result
+    int result = (humidity << 8) + temperature;
+    Serial.write(RESPONSE_START_CHAR);
+    Serial.write(clientId);
+    Serial.print(result);
+    Serial.print(RESPONSE_END_STRING);
+  }
+}
+
+

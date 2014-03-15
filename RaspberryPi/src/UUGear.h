@@ -59,4 +59,18 @@ extern int analogRead(UUGearDevice *dev, int pin);
 
 extern void detachUUGearDevice (UUGearDevice *dev);
 
+/*
+ * Read humidity and temperature values from DHT11 sensor
+ *
+ * parameters:
+ *	dev is the pointer of the device struct
+ *	pin is the digital pin that connects to DATA wire of DHT11
+ * returns:
+ *	integer that lowest byte is temperature while higher byte is humidity
+ *	-1 for timeout
+ *	-2 for checksum error
+ *	-3 for communication error (please check /var/log/syslog)
+ */
+extern int readDHT11(UUGearDevice *dev, int pin);
+
 extern void cleanupUUGear ();

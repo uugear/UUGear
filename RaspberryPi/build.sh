@@ -36,6 +36,8 @@ cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -l
 
 cc -L$TARGET_DIR -Wall ReadSpeed.c -o $TARGET_DIR/ReadSpeed -lUUGear -lrt
 
+cc -L$TARGET_DIR -Wall ReadDHT11.c -o $TARGET_DIR/ReadDHT11 -lUUGear -lrt
+
 cd $CURRENT_DIR
 
 echo "Copying examples in Python..."

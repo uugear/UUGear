@@ -56,6 +56,7 @@
 #define MSG_EXIT    		0
 #define MSG_GET_DEVICE  	1
 #define MSG_CLOSE_DEVICE  	2
+
 #define MSG_SET_PIN_INPUT	10
 #define MSG_SET_PIN_OUTPUT	11
 #define MSG_SET_PIN_LOW		12
@@ -64,8 +65,11 @@
 #define MSG_ANALOG_WRITE	15
 #define MSG_ANALOG_READ		16
 
+#define MSG_READ_DHT11		41
+
 /* Commands between daemon and UUGear device */
 #define CMD_GET_DEVICE_ID  	0x30
+
 #define CMD_SET_PIN_OUTPUT	0x31
 #define CMD_SET_PIN_INPUT	0x32
 #define CMD_SET_PIN_HIGH	0x33
@@ -73,6 +77,9 @@
 #define CMD_GET_PIN_STATUS	0x35
 #define CMD_ANALOG_WRITE	0x36
 #define CMD_ANALOG_READ		0x37
+
+#define CMD_READ_DHT11		0x50
+
 
 #define ASSERT_TRUE(x) \
     do { \
