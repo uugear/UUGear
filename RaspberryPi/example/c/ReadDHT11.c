@@ -6,37 +6,30 @@
 #include <mqueue.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include "../../src/UUGear.h"
 
-
-double getCurTime()
-{
-	struct timeval  tv;
-	gettimeofday(&tv, NULL);
-	double time_in_mill = ((double)tv.tv_sec) * 1000 + ((double)tv.tv_usec) / 1000 ;
-	return time_in_mill;
-}
 
 int main(int argc, char **argv)
 {
 	setupUUGear();
 	
-	setShowLogs(1);
+	setShowLogs(0);
 	
 	UUGearDevice dev = attachUUGearDevice ("UUGear-Arduino-7853-2668");
 	
 	if (dev.fd != -1)
 	{
-		double begin, end;
-		
-		begin = getCurTime();
-		int value = readDHT11(&dev, 4);
-		end = getCurTime();
-		printf("Read DHT11 on D4 takes %f ms, value=%d\n", end - begin, value);
-		
-		printf("Humidity=%d%%, Temperature=%dC\n", value >> 8, value & 0xFF);
-		
+		int i;
+		for (i = 0; i < 200; i ++)
+		{
+			time_t mytime = time(NULL);
+			int value = readDHT11(&dev, 4);
+		    printf(ctime(&mytime));
+			printf("H: %d%%  T: %dC\n", value >> 8, value & 0xFF);
+			sleep(1);
+		}
 		detachUUGearDevice (&dev);
 	}
 	else
