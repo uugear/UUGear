@@ -104,9 +104,6 @@ int openDevice(struct dirent *dir)
 			}
 		}
 		
-		// close the device
-		serialClose (fd);
-		
 		// output the fixed device id and device name
 		if (startsWith (buf, UUGEAR_ID_PREFIX))
 		{
@@ -116,7 +113,7 @@ int openDevice(struct dirent *dir)
 				buf[end - buf] = 0;
 			}
 			printf ("%s\t(%s)\n", buf, devicePath);
-			return 1;
+			return fd;
 		}
 	}
 	return 0;
@@ -141,7 +138,9 @@ int main(int argc, char **argv)
   			{
   				if (startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX1) || startsWith (dir->d_name, UUGEAR_DEVICE_PREFIX2))
   				{
-  					if (openDevice(dir))
+  					int fd1 = 0;
+  					int fd2 = 0;
+  					if (fd1 = openDevice(dir))
   					{
 						found ++;
   					}
@@ -149,11 +148,14 @@ int main(int argc, char **argv)
   					{
   						/* newly connected device may need a second shoot */
   						sleep (1);
-  						if (openDevice(dir))
+  						if (fd2 = openDevice(dir))
   						{
   							found ++;	
   						}						
   					}
+  					// close the device
+					if (fd1) serialClose (fd1);
+					if (fd2) serialClose (fd2);
 				}
 			}
 		}
