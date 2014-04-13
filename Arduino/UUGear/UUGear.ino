@@ -41,8 +41,34 @@
 #define RESPONSE_START_CHAR  '\t'
 #define RESPONSE_END_STRING  ":)"
 
+#define SCRIPT_CHANNEL_NUMBER  2
+#define SCRIPT_INPUT_LENGTH    64
+#define SCRIPT_OUTPUT_LENGTH   192
+
+
 String cmdBuf = "";
 int cmdEndStrLen = strlen(COMMAND_END_STRING);
+
+typedef struct {
+  byte clientId;
+  byte input[SCRIPT_INPUT_LENGTH];
+  volatile byte output[SCRIPT_OUTPUT_LENGTH];
+  int inputIndex;
+  int inputLength;
+  byte setPin;
+  byte setState;
+  volatile int outputIndex;
+  volatile byte monitorPin;
+  volatile byte monitorState;
+  volatile unsigned int monitorCounter;
+  volatile unsigned long delayCounter;
+} 
+ScriptChannel;
+
+ScriptChannel scriptChannels[SCRIPT_CHANNEL_NUMBER];
+
+volatile unsigned long lastMicros;
+unsigned long elapsedMicros;
 
 void setup() {
   // if has no id yet, generate one
@@ -55,10 +81,63 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect
   }
+
+  // initialize mini script engine
+  for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
+    scriptChannels[i].inputIndex = -1;
+    scriptChannels[i].outputIndex = -1;
+    scriptChannels[i].delayCounter = 0;
+    scriptChannels[i].setPin = 0;
+    scriptChannels[i].setState = 0;
+    scriptChannels[i].monitorPin = 0;
+    scriptChannels[i].monitorState = 0;
+    scriptChannels[i].monitorCounter = 0;
+  }
+
+  // initialize timer2: CTC mode and prescale by 8, interval=10us
+  cli();
+  TCCR2A = (1 << WGM21);
+  TCCR2B = (1 << CS21);
+  TIMSK2 = (1 << OCIE2A);
+  OCR2A = 2 * F_CPU / 1.0e6 - 1;
+  sei();
+
+  lastMicros = micros();
+
   //Serial.println(getID());
 }
 
+// timer 2 interrupt handler
+ISR(TIMER2_COMPA_vect) {
+  for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
+    // if is monitoring a pin, record its state change, if there is any
+    if (scriptChannels[i].monitorPin != 0) {
+      byte result = digitalRead(scriptChannels[i].monitorPin);
+      if (result != scriptChannels[i].monitorState) {
+        if (scriptChannels[i].outputIndex < SCRIPT_OUTPUT_LENGTH) {
+          memcpy((void *)&scriptChannels[i].output[scriptChannels[i].outputIndex], (void *)&scriptChannels[i].monitorCounter, 2);
+          scriptChannels[i].outputIndex += 2;
+          scriptChannels[i].monitorState = !scriptChannels[i].monitorState;
+          scriptChannels[i].monitorCounter = 0;
+        }
+      } 
+      else {
+        scriptChannels[i].monitorCounter ++;
+      }
+    }
+  }
+}
+
 void loop() {
+  // calculate the elapsed time since last circle
+  unsigned long currentMicros = micros();
+  elapsedMicros = currentMicros > lastMicros ? currentMicros - lastMicros : 4294967295 - lastMicros + currentMicros;
+  lastMicros = currentMicros;
+
+  // process mini scripts
+  processScripts();
+
+  // listen to incoming commands
   int len = Serial.available();
   for (int i = 0; i < len; i ++) {
     cmdBuf += (char)Serial.read();
@@ -127,6 +206,76 @@ void logAsHex(String str) {
   Serial.println(hex);
 }
 
+// process scripts
+void processScripts() {
+  for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
+    if (scriptChannels[i].inputIndex != -1) {
+
+      // deduce the delay counter
+      scriptChannels[i].delayCounter = elapsedMicros >= scriptChannels[i].delayCounter ? 0 : scriptChannels[i].delayCounter - elapsedMicros;
+
+      // go ahead if delay counter is zero, otherwise check it later
+      if (scriptChannels[i].delayCounter == 0) {
+        if (scriptChannels[i].inputIndex == scriptChannels[i].inputLength) {
+          // finish the script
+          scriptChannels[i].inputIndex = -1;
+          scriptChannels[i].monitorPin = 0;
+          scriptChannels[i].monitorCounter = 0;
+          scriptChannels[i].setPin = 0;
+          scriptChannels[i].setState = 0;
+          if (scriptChannels[i].outputIndex > 0) {
+            // response with output data
+            Serial.write(RESPONSE_START_CHAR);
+            Serial.write(scriptChannels[i].clientId);
+            Serial.write((byte *)scriptChannels[i].output, scriptChannels[i].outputIndex);
+            Serial.print(RESPONSE_END_STRING);
+          }
+        } 
+        else {
+          // process in this script channel
+          byte header = scriptChannels[i].input[scriptChannels[i].inputIndex ++];
+          byte operation = (header & 0x80) >> 7;
+          byte pin = (header & 0x7E) >> 1;
+          byte state = (header & 0x01);
+          // read time bytes
+          while (scriptChannels[i].inputIndex < scriptChannels[i].inputLength) {
+            byte timeByte = scriptChannels[i].input[scriptChannels[i].inputIndex ++];
+            scriptChannels[i].delayCounter = (scriptChannels[i].delayCounter << 7) | (timeByte & 0x7F);
+            if (!(timeByte & 0x80)) {      
+              break;
+            }
+          }
+          if (operation == 1) {
+            // write new state to the pin
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, state);
+            scriptChannels[i].setPin = pin;
+            scriptChannels[i].setState = state;
+          } 
+          else {
+            // start monitoring the pin state
+            pinMode(pin, INPUT);
+            byte result = digitalRead(pin);
+            if (pin == scriptChannels[i].setPin && result != scriptChannels[i].setState) {
+              // pin state alignment
+              byte header = (pin << 1) | scriptChannels[i].setState;
+              scriptChannels[i].output[scriptChannels[i].outputIndex ++] = header;
+              scriptChannels[i].output[scriptChannels[i].outputIndex ++] = 0;
+              scriptChannels[i].output[scriptChannels[i].outputIndex ++] = 0;
+            } else {
+              byte header = (pin << 1) | result;
+              scriptChannels[i].output[scriptChannels[i].outputIndex ++] = header;
+            }
+            scriptChannels[i].monitorPin = pin;
+            scriptChannels[i].monitorState = result;
+            scriptChannels[i].monitorCounter = 0;
+          }
+        }
+      }
+    }
+  }
+}
+
 // process the command
 void processCommand(String cmd) {
   //logAsHex(cmd);
@@ -159,6 +308,9 @@ void processCommand(String cmd) {
       break;
     case 0x50:
       cmdReadDHT11(cmd);
+      break;
+    case 0xF0:
+      cmdScript(cmd);
     }
   }
 }
@@ -322,4 +474,37 @@ void cmdReadDHT11(String cmd) {
   }
 }
 
-
+// command to run mini script
+// example: 55 F0 89 BD 84 40 88 BD 84 40 89 BD 84 40 88 01 0D 0A
+void cmdScript(String cmd) {
+  int cmdLen = cmd.length();
+  if (cmdLen > 5) {
+    byte clientId = cmd.charAt(cmdLen - 3);
+    if (cmdLen > SCRIPT_INPUT_LENGTH + 5) {
+      // script is too long, response -2 for failure
+      Serial.write(RESPONSE_START_CHAR);
+      Serial.write(clientId);
+      Serial.print("-2");
+      Serial.print(RESPONSE_END_STRING);
+      return;
+    }
+    for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
+      if (scriptChannels[i].inputIndex == -1) {
+        // available channel found, use it
+        scriptChannels[i].clientId = clientId;
+        String script = cmd.substring(2, cmdLen - 3);
+        script.getBytes(scriptChannels[i].input, SCRIPT_INPUT_LENGTH);
+        scriptChannels[i].inputIndex = 0;
+        scriptChannels[i].inputLength = script.length();
+        scriptChannels[i].delayCounter = 0;
+        scriptChannels[i].outputIndex = 0;
+        return;
+      }
+    }
+    // all script channel are in used, response -1 for failure
+    Serial.write(RESPONSE_START_CHAR);
+    Serial.write(clientId);
+    Serial.print("-1");
+    Serial.print(RESPONSE_END_STRING);
+  }
+}
