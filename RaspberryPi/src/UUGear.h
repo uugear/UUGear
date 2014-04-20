@@ -64,7 +64,8 @@ extern void detachUUGearDevice (UUGearDevice *dev);
  *
  * parameters:
  *	dev is the pointer of the device struct
- *	pin is the digital pin that connects to DATA wire of DHT11
+ *	pin is the digital pin that connects to the DATA wire of DHT11
+ *
  * returns:
  *	integer that lowest byte is temperature while higher byte is humidity
  *	-1 for timeout
@@ -72,5 +73,20 @@ extern void detachUUGearDevice (UUGearDevice *dev);
  *	-3 for communication error (please check /var/log/syslog)
  */
 extern int readDHT11(UUGearDevice *dev, int pin);
+
+/**
+ * Read distance value (in cm) from HC-SR04 sensor
+ *
+ * parameters:
+ *	dev is the pointer of the device struct
+ *	trigPin is the digital pin that connects to the TRIG wire of SR04
+ *	echoPin is the digital pin that connects to the ECHO wire of SR04
+ *  echoPin could be the same than trigPin if you wire them together.
+ *
+ * returns:
+ *	float value of the distance in cm
+ *  you may need to check if it is in the correct range by yourself.
+ */
+extern float readSR04(UUGearDevice *dev, int trigPin, int echoPin);
 
 extern void cleanupUUGear ();

@@ -469,6 +469,11 @@ int main(int argc, char **argv)
 					case MSG_READ_DHT11:
 						sendCommand(CMD_READ_DHT11, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
+					case MSG_READ_SR04:
+						sendCommandWithParameter(CMD_READ_SR04, clientId, targetFd,
+							count > 3 ? (atoi (parts[3]) & 0xFF) : -1,
+							count > 4 ? (atoi (parts[4]) & 0xFF) : -1);
+						break;
 				}
 			}
         }

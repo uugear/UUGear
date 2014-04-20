@@ -219,12 +219,10 @@ void setPinLow(UUGearDevice *dev, int pin)
 	sendMessage(dev->in, MSG_SET_PIN_LOW, dev->clientId, dev->fd, pin);
 }
 
-
-int waitForInteger(UUGearDevice *dev, int * errorCode)
+char * waitForString(UUGearDevice *dev, int * errorCode)
 {
 	int errCode = 0;
-	int value = -1;
-	char buffer[MAX_MSG_SIZE + 1];
+	char * buffer = malloc (MAX_MSG_SIZE + 1);
 	int bytes = 0;
 	struct timespec ts;
     ts.tv_sec = time(0) + 2;
@@ -245,15 +243,29 @@ int waitForInteger(UUGearDevice *dev, int * errorCode)
     else
     {
     	buffer[bytes] = 0;
-		value = atoi (buffer);
     }
     if (errorCode != NULL)
 	{
 		*errorCode = errCode;
 	}
-	return value;
+	return (char *)buffer;
 }
 
+float waitForFloat(UUGearDevice *dev, int * errorCode)
+{
+	char * str = waitForString (dev, errorCode);
+	float result = atof (str);
+	free ((void *)str);
+	return result;
+}
+
+int waitForInteger(UUGearDevice *dev, int * errorCode)
+{
+	char * str = waitForString (dev, errorCode);
+	int result = atoi (str);
+	free ((void *)str);
+	return result;
+}
 
 int getPinStatus(UUGearDevice *dev, int pin)
 {
@@ -284,6 +296,14 @@ int readDHT11(UUGearDevice *dev, int pin)
 	int errorCode = 0;
 	int result = waitForInteger(dev, &errorCode);
 	return errorCode == 0 ? result : -3;
+}
+
+float readSR04(UUGearDevice *dev, int trigPin, int echoPin)
+{
+	sendMessageWithParameter(dev->in, MSG_READ_SR04, dev->clientId, dev->fd, trigPin, echoPin);
+	int errorCode = 0;
+	float result = waitForFloat(dev, &errorCode);
+	return errorCode == 0 ? result : errorCode;
 }
 
 

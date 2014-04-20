@@ -22,6 +22,10 @@ cc -o $TARGET_DIR/lsuu lsuu.c serial.c
 
 cp UUGear.py $TARGET_DIR/UUGear.py
 
+echo "Copying shared object file to /usr/lib/..."
+
+sudo cp $TARGET_DIR/libUUGear.so /usr/lib/
+
 echo "Building examples in C..."
 
 EXAMPLE_DIR=$CURRENT_DIR/example/c
@@ -37,6 +41,8 @@ cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -l
 cc -L$TARGET_DIR -Wall ReadSpeed.c -o $TARGET_DIR/ReadSpeed -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall ReadDHT11.c -o $TARGET_DIR/ReadDHT11 -lUUGear -lrt
+
+cc -L$TARGET_DIR -Wall ReadSR04.c -o $TARGET_DIR/ReadSR04 -lUUGear -lrt
 
 cd $CURRENT_DIR
 

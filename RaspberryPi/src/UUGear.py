@@ -24,7 +24,7 @@
  #
  #######################################################################
  
-from ctypes import CDLL, Structure, POINTER, byref, c_char, c_int, c_char_p
+from ctypes import CDLL, Structure, POINTER, byref, c_char, c_int, c_float, c_char_p
 
 UUGEAR_ID_MAX_LENGTH = 1024
 
@@ -68,6 +68,9 @@ uugearlib.analogRead.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
 uugearlib.readDHT11.restype = c_int
 uugearlib.readDHT11.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
+uugearlib.readSR04.restype = c_float
+uugearlib.readSR04.argtypes = [POINTER(UUGearDeviceProfile), c_int, c_int]
 
 uugearlib.detachUUGearDevice.restype = None
 uugearlib.detachUUGearDevice.argtypes = [POINTER(UUGearDeviceProfile)]
@@ -131,5 +134,11 @@ class UUGearDevice(object):
 	def readDHT11(self, pin):
 		if self.isValid():
 			return uugearlib.readDHT11(byref(self.devProfile), pin)
+		else:
+			return -1
+			
+	def readSR04(self, trigPin, echoPin):
+		if self.isValid():
+			return uugearlib.readSR04(byref(self.devProfile), trigPin, echoPin)
 		else:
 			return -1

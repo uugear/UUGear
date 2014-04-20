@@ -262,7 +262,8 @@ void processScripts() {
               scriptChannels[i].output[scriptChannels[i].outputIndex ++] = header;
               scriptChannels[i].output[scriptChannels[i].outputIndex ++] = 0;
               scriptChannels[i].output[scriptChannels[i].outputIndex ++] = 0;
-            } else {
+            } 
+            else {
               byte header = (pin << 1) | result;
               scriptChannels[i].output[scriptChannels[i].outputIndex ++] = header;
             }
@@ -309,8 +310,12 @@ void processCommand(String cmd) {
     case 0x50:
       cmdReadDHT11(cmd);
       break;
+    case 0x51:
+      cmdReadSR04(cmd);
+      break;
     case 0xF0:
       cmdScript(cmd);
+      break;
     }
   }
 }
@@ -467,6 +472,35 @@ void cmdReadDHT11(String cmd) {
 
     // response with the result
     int result = (humidity << 8) + temperature;
+    Serial.write(RESPONSE_START_CHAR);
+    Serial.write(clientId);
+    Serial.print(result);
+    Serial.print(RESPONSE_END_STRING);
+  }
+}
+
+// command to read HC-SR04 sensor
+// example: 55 51 04 05 01 0D 0A
+void cmdReadSR04(String cmd) {
+  if (cmd.length() > 6) {
+    byte trigPin = cmd.charAt(2);
+    byte echoPin = cmd.charAt(3);
+    byte clientId = cmd.charAt(4);
+    // trigger the sensor
+    pinMode(trigPin, OUTPUT);
+    digitalWrite(trigPin, LOW); 
+    delayMicroseconds(2); 
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10); 
+    digitalWrite(trigPin, LOW);
+    // read result
+    pinMode(echoPin, INPUT);
+    while (digitalRead(echoPin) == LOW) {}
+    unsigned long start = micros();
+    while (digitalRead(echoPin) == HIGH) {}
+    unsigned long duration = micros() - start;
+    // calculate the distance in cm
+    float result = (float)duration / 58.2;
     Serial.write(RESPONSE_START_CHAR);
     Serial.write(clientId);
     Serial.print(result);

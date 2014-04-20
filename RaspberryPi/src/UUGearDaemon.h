@@ -66,6 +66,7 @@
 #define MSG_ANALOG_READ		16
 
 #define MSG_READ_DHT11		41
+#define MSG_READ_SR04		42
 
 /* Commands between daemon and UUGear device */
 #define CMD_GET_DEVICE_ID  	0x30
@@ -79,7 +80,7 @@
 #define CMD_ANALOG_READ		0x37
 
 #define CMD_READ_DHT11		0x50
-
+#define CMD_READ_SR04		0x51
 
 #define ASSERT_TRUE(x) \
     do { \
