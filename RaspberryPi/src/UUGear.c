@@ -289,6 +289,10 @@ int analogRead(UUGearDevice *dev, int pin)
 	return errorCode == 0 ? result : -1;
 }
 
+void analogReference(UUGearDevice *dev, int type)
+{
+	sendMessage(dev->in, MSG_ANALOG_REFERENCE, dev->clientId, dev->fd, type);
+}
 
 int readDHT11(UUGearDevice *dev, int pin)
 {

@@ -307,6 +307,9 @@ void processCommand(String cmd) {
     case 0x37:
       cmdAnalogRead(cmd);
       break;
+    case 0x38:
+      cmdAnalogReference(cmd);
+      break;
     case 0x50:
       cmdReadDHT11(cmd);
       break;
@@ -392,7 +395,7 @@ void cmdAnalogWrite(String cmd) {
 }
 
 // command to read analog value
-// example: 55 37 09 01 0D 0A
+// example: 55 37 04 01 0D 0A
 void cmdAnalogRead(String cmd) {
   if (cmd.length() > 5) {
     byte pin = cmd.charAt(2);
@@ -401,6 +404,22 @@ void cmdAnalogRead(String cmd) {
     Serial.write(clientId);
     Serial.print(String(analogRead(pin)));
     Serial.print(RESPONSE_END_STRING);
+  }
+}
+
+// command to set analog reference
+// example: 55 38 01 0D 0A
+void cmdAnalogReference(String cmd) {
+  if (cmd.length() > 4) {
+    byte type = cmd.charAt(2);
+    switch (type) {
+      case 0x00:
+        analogReference(DEFAULT);
+        break;
+      case 0x01:
+        analogReference(EXTERNAL);
+        break;
+    }
   }
 }
 

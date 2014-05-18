@@ -57,6 +57,18 @@ extern void analogWrite(UUGearDevice *dev, int pin, int value);
 
 extern int analogRead(UUGearDevice *dev, int pin);
 
+/**
+ * Configures the reference voltage used for analog input
+ * (i.e. the value used as the top of the input range)
+ *
+ * parameters:
+ *	dev is the pointer of the device struct
+ *	type is the reference type:
+ *		0 - DEFAULT
+ *		1 - EXTERNAL
+ */
+extern void analogReference(UUGearDevice *dev, int type);
+
 extern void detachUUGearDevice (UUGearDevice *dev);
 
 /*

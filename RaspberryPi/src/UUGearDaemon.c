@@ -466,6 +466,9 @@ int main(int argc, char **argv)
 					case MSG_ANALOG_READ:
 						sendCommand(CMD_ANALOG_READ, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
+					case MSG_ANALOG_REFERENCE:
+						sendCommand(CMD_ANALOG_REFERENCE, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
 					case MSG_READ_DHT11:
 						sendCommand(CMD_READ_DHT11, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
