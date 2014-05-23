@@ -66,6 +66,9 @@ uugearlib.analogWrite.argtypes = [POINTER(UUGearDeviceProfile), c_int, c_int]
 uugearlib.analogRead.restype = c_int
 uugearlib.analogRead.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
+uugearlib.analogReference.restype = None
+uugearlib.analogReference.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
 uugearlib.readDHT11.restype = c_int
 uugearlib.readDHT11.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
@@ -130,6 +133,10 @@ class UUGearDevice(object):
 			return uugearlib.analogRead(byref(self.devProfile), pin)
 		else:
 			return -1
+			
+	def analogReference(self, refType):
+		if self.isValid():
+			uugearlib.analogReference(byref(self.devProfile), refType)
 
 	def readDHT11(self, pin):
 		if self.isValid():
