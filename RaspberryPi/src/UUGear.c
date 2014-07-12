@@ -7,7 +7,7 @@
  *
  ***********************************************************************
  *  This file is part of UUGear Solution: 
- *  http://www.uugear.com/?page_id=50
+ *  http://www.uugear.com/uugear-rpi-arduino-solution/
  *  
  *  UUGear Solution is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
@@ -292,6 +292,28 @@ int analogRead(UUGearDevice *dev, int pin)
 void analogReference(UUGearDevice *dev, int type)
 {
 	sendMessage(dev->in, MSG_ANALOG_REFERENCE, dev->clientId, dev->fd, type);
+}
+
+void attachServo(UUGearDevice *dev, int pin)
+{
+	sendMessage(dev->in, MSG_SERVO_ATTACH, dev->clientId, dev->fd, pin);
+}
+
+void writeServo(UUGearDevice *dev, int pin, int angle) {
+	sendMessageWithParameter(dev->in, MSG_SERVO_WRITE, dev->clientId, dev->fd, pin, angle);
+}
+
+int readServo(UUGearDevice *dev, int pin)
+{
+	sendMessage(dev->in, MSG_SERVO_READ, dev->clientId, dev->fd, pin);
+	int errorCode = 0;
+	int result = waitForInteger(dev, &errorCode);
+	return errorCode == 0 ? result : -1;
+}
+
+void detachServo(UUGearDevice *dev, int pin)
+{
+	sendMessage(dev->in, MSG_SERVO_DETACH, dev->clientId, dev->fd, pin);
 }
 
 int readDHT11(UUGearDevice *dev, int pin)

@@ -7,7 +7,7 @@
  #
  #######################################################################
  #  This file is part of UUGear Solution: 
- #  http://www.uugear.com/?page_id=50
+ #  http://www.uugear.com/uugear-rpi-arduino-solution/
  #  
  #  UUGear Solution is free software: you can redistribute it and/or modify
  #  it under the terms of the GNU Lesser General Public License as published
@@ -68,6 +68,18 @@ uugearlib.analogRead.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
 uugearlib.analogReference.restype = None
 uugearlib.analogReference.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
+uugearlib.attachServo.restype = None
+uugearlib.attachServo.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
+uugearlib.writeServo.restype = None
+uugearlib.writeServo.argtypes = [POINTER(UUGearDeviceProfile), c_int, c_int]
+
+uugearlib.readServo.restype = c_int
+uugearlib.readServo.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+
+uugearlib.detachServo.restype = None
+uugearlib.detachServo.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
 uugearlib.readDHT11.restype = c_int
 uugearlib.readDHT11.argtypes = [POINTER(UUGearDeviceProfile), c_int]
@@ -137,6 +149,24 @@ class UUGearDevice(object):
 	def analogReference(self, refType):
 		if self.isValid():
 			uugearlib.analogReference(byref(self.devProfile), refType)
+
+	def attachServo(self, pin):
+		if self.isValid():
+			uugearlib.attachServo(byref(self.devProfile), pin)
+			
+	def writeServo(self, pin, angle):
+		if self.isValid():
+			uugearlib.writeServo(byref(self.devProfile), pin, angle)
+
+	def readServo(self, pin):
+		if self.isValid():
+			return uugearlib.readServo(byref(self.devProfile), pin)
+		else:
+			return -1
+			
+	def detachServo(self, pin):
+		if self.isValid():
+			uugearlib.detachServo(byref(self.devProfile), pin)
 
 	def readDHT11(self, pin):
 		if self.isValid():

@@ -7,7 +7,7 @@
  *
  ***********************************************************************
  *  This file is part of UUGear Solution: 
- *  http://www.uugear.com/?page_id=50
+ *  http://www.uugear.com/uugear-rpi-arduino-solution/
  *  
  *  UUGear Solution is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
@@ -70,6 +70,46 @@ extern int analogRead(UUGearDevice *dev, int pin);
 extern void analogReference(UUGearDevice *dev, int type);
 
 extern void detachUUGearDevice (UUGearDevice *dev);
+
+/**
+ * Attach the servo on given pin
+ * 
+ * parameters:
+ *  dev is the pointer of the device struct
+ *	pin is the digital pin that links to the signal line of servo
+ */
+extern void attachServo(UUGearDevice *dev, int pin);
+
+/**
+ * Write the angle of servo on given pin
+ * 
+ * parameters:
+ *  dev is the pointer of the device struct
+ *	pin is the digital pin that connects to the signal line of servo
+ *  angle is the target angle of the servo
+ */
+extern void writeServo(UUGearDevice *dev, int pin, int angle);
+
+/**
+ * Read the angle of servo on given pin
+ * 
+ * parameters:
+ *  dev is the pointer of the device struct
+ *	pin is the digital pin that connects to the signal line of servo
+ *
+ * returns:
+ *  integer that represents the angle of the servo
+ */
+extern int readServo(UUGearDevice *dev, int pin);
+
+/**
+ * Detach the servo on given pin
+ * 
+ * parameters:
+ *  dev is the pointer of the device struct
+ *	pin is the digital pin that links to the signal line of servo
+ */
+extern void detachServo(UUGearDevice *dev, int pin);
 
 /*
  * Read humidity and temperature values from DHT11 sensor

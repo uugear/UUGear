@@ -7,7 +7,7 @@
  *
  ***********************************************************************
  *  This file is part of UUGear Solution: 
- *  http://www.uugear.com/?page_id=50
+ *  http://www.uugear.com/uugear-rpi-arduino-solution/
  *  
  *  UUGear Solution is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
@@ -66,6 +66,11 @@
 #define MSG_ANALOG_READ			16
 #define MSG_ANALOG_REFERENCE	17
 
+#define MSG_SERVO_ATTACH		25
+#define MSG_SERVO_WRITE			26
+#define MSG_SERVO_READ			27
+#define MSG_SERVO_DETACH		28
+
 #define MSG_READ_DHT11			41
 #define MSG_READ_SR04			42
 
@@ -80,6 +85,11 @@
 #define CMD_ANALOG_WRITE		0x36
 #define CMD_ANALOG_READ			0x37
 #define CMD_ANALOG_REFERENCE	0x38
+
+#define CMD_SERVO_ATTACH		0x40
+#define CMD_SERVO_WRITE			0x41
+#define CMD_SERVO_READ			0x42
+#define CMD_SERVO_DETACH		0x43
 
 #define CMD_READ_DHT11			0x50
 #define CMD_READ_SR04			0x51

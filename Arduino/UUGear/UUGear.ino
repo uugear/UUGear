@@ -28,6 +28,7 @@
  * the serial monitor, you should be able to see the 1 + {device id} + :)
  */
 #include <EEPROM.h>
+#include <Servo.h>
 
 #define BAUD_RATE  115200
 
@@ -41,10 +42,14 @@
 #define RESPONSE_START_CHAR  '\t'
 #define RESPONSE_END_STRING  ":)"
 
+#define SERVO_MAX_NUMBER  12
+
 #define SCRIPT_CHANNEL_NUMBER  2
 #define SCRIPT_INPUT_LENGTH    64
 #define SCRIPT_OUTPUT_LENGTH   192
 
+Servo allServos[SERVO_MAX_NUMBER];
+int servoPins[SERVO_MAX_NUMBER];
 
 String cmdBuf = "";
 int cmdEndStrLen = strlen(COMMAND_END_STRING);
@@ -80,6 +85,11 @@ void setup() {
   Serial.begin(BAUD_RATE);
   while (!Serial) {
     ; // wait for serial port to connect
+  }
+  
+  // initialize servo pins
+  for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
+    servoPins[i] = -1;
   }
 
   // initialize mini script engine
@@ -310,6 +320,18 @@ void processCommand(String cmd) {
     case 0x38:
       cmdAnalogReference(cmd);
       break;
+    case 0x40:
+      cmdAttachServo(cmd);
+      break;
+    case 0x41:
+      cmdWriteServo(cmd);
+      break;
+    case 0x42:
+      cmdReadServo(cmd);
+      break;
+    case 0x43:
+      cmdDetachServo(cmd);
+      break;
     case 0x50:
       cmdReadDHT11(cmd);
       break;
@@ -419,6 +441,77 @@ void cmdAnalogReference(String cmd) {
       case 0x01:
         analogReference(EXTERNAL);
         break;
+    }
+  }
+}
+
+// command to attach given pin to servo
+// example: 55 40 04 01 0D 0A
+void cmdAttachServo(String cmd) {
+  if (cmd.length() > 5) {
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);
+    int servoIndex = -1;
+    for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
+      if (servoPins[i] == pin) {
+        return;
+      } else if (servoIndex == -1 && servoPins[i] == -1) {
+        servoIndex = i;
+      }
+    }
+    if (servoIndex != -1) {
+      allServos[servoIndex].attach(pin);
+      servoPins[servoIndex] = pin;
+    }
+  }
+}
+
+// command to write angle to servo on given pin
+// example: 55 41 04 64 01 0D 0A
+void cmdWriteServo(String cmd) {
+  if (cmd.length() > 6) {
+    byte pin = cmd.charAt(2);
+    byte angle = cmd.charAt(3);
+    byte clientId = cmd.charAt(4);
+    for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
+      if (servoPins[i] == pin) {
+        allServos[i].write(angle);
+        return;
+      }
+    }
+  }
+}
+
+// command to read angle from servo on given pin
+// example: 55 42 04 01 0D 0A
+void cmdReadServo(String cmd) {
+  if (cmd.length() > 5) {
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);
+    int servoIndex = -1;
+    for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
+      if (servoPins[i] == pin) {
+        Serial.write(RESPONSE_START_CHAR);
+        Serial.write(clientId);
+        Serial.print(String(allServos[i].read()));
+        Serial.print(RESPONSE_END_STRING);
+        return;
+      }
+    }
+  }
+}
+
+// command to detach given pin from servo
+// example: 55 43 04 01 0D 0A
+void cmdDetachServo(String cmd) {
+  if (cmd.length() > 5) {
+    byte pin = cmd.charAt(2);
+    byte clientId = cmd.charAt(3);
+    for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
+      if (servoPins[i] == pin) {
+        allServos[i].detach();
+        return;
+      }
     }
   }
 }

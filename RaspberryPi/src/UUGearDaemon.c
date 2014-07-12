@@ -7,7 +7,7 @@
  *
  ***********************************************************************
  *  This file is part of UUGear Solution: 
- *  http://www.uugear.com/?page_id=50
+ *  http://www.uugear.com/uugear-rpi-arduino-solution/
  *  
  *  UUGear Solution is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
@@ -468,6 +468,20 @@ int main(int argc, char **argv)
 						break;
 					case MSG_ANALOG_REFERENCE:
 						sendCommand(CMD_ANALOG_REFERENCE, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
+					case MSG_SERVO_ATTACH:
+						sendCommand(CMD_SERVO_ATTACH, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
+					case MSG_SERVO_WRITE:
+						sendCommandWithParameter(CMD_SERVO_WRITE, clientId, targetFd,
+							count > 3 ? (atoi (parts[3]) & 0xFF) : -1,
+							count > 4 ? (atoi (parts[4]) & 0xFF) : -1);
+						break;
+					case MSG_SERVO_READ:
+						sendCommand(CMD_SERVO_READ, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
+						break;
+					case MSG_SERVO_DETACH:
+						sendCommand(CMD_SERVO_DETACH, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
 						break;
 					case MSG_READ_DHT11:
 						sendCommand(CMD_READ_DHT11, clientId, targetFd, count > 3 ? atoi(parts[3]) : -1);
