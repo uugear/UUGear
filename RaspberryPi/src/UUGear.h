@@ -71,6 +71,8 @@ extern void analogReference(UUGearDevice *dev, int type);
 
 extern void detachUUGearDevice (UUGearDevice *dev);
 
+extern void resetUUGearDevice(UUGearDevice *dev);
+
 /**
  * Attach the servo on given pin
  * 
@@ -141,4 +143,15 @@ extern int readDHT11(UUGearDevice *dev, int pin);
  */
 extern float readSR04(UUGearDevice *dev, int trigPin, int echoPin);
 
-extern void cleanupUUGear ();
+extern void cleanupUUGear();
+
+
+extern void sendMessage(mqd_t in, int msgType, int clientId, int fd, int pin);
+
+extern void sendMessageWithParameter(mqd_t in, int msgType, int clientId, int fd, int pin, int parameter);
+
+extern int waitForInteger(UUGearDevice *dev, int * errorCode);
+
+extern char * waitForString(UUGearDevice *dev, int * errorCode);
+
+extern float waitForFloat(UUGearDevice *dev, int * errorCode);

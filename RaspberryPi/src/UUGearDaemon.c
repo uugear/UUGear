@@ -367,6 +367,12 @@ void openDeviceById(int clientId, char *id)
 	}
 }
 
+void sendCommandWithoutParameter(char cmd, int clientId, int targetFd)
+{
+	syslog (LOG_INFO, "Send command: cmd=0x%02x, clientId=%d, fd=%d", cmd, clientId, targetFd);
+	char command[] = { COMMAND_START_CHAR, cmd, (char)(clientId & 0xFF), COMMAND_END_CHAR1, COMMAND_END_CHAR2, 0x00 };
+	serialWriteString (targetFd, command);
+}
 
 void sendCommand(char cmd, int clientId, int targetFd, int pin)
 {
@@ -490,6 +496,9 @@ int main(int argc, char **argv)
 						sendCommandWithParameter(CMD_READ_SR04, clientId, targetFd,
 							count > 3 ? (atoi (parts[3]) & 0xFF) : -1,
 							count > 4 ? (atoi (parts[4]) & 0xFF) : -1);
+						break;
+					case MSG_RESET_DEVICE:
+						sendCommandWithoutParameter(CMD_RESET_DEVICE, clientId, targetFd);
 						break;
 				}
 			}

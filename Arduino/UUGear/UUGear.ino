@@ -75,6 +75,9 @@ ScriptChannel scriptChannels[SCRIPT_CHANNEL_NUMBER];
 volatile unsigned long lastMicros;
 unsigned long elapsedMicros;
 
+// declare reset function
+void(* resetDevice) (void) = 0;
+
 void setup() {
   // if has no id yet, generate one
   if (getID() == "") {
@@ -341,6 +344,9 @@ void processCommand(String cmd) {
     case 0xF0:
       cmdScript(cmd);
       break;
+    case 0xFF:
+      resetDevice();
+      break;
     }
   }
 }
@@ -510,6 +516,7 @@ void cmdDetachServo(String cmd) {
     for (int i = 0; i < SERVO_MAX_NUMBER; i ++) {
       if (servoPins[i] == pin) {
         allServos[i].detach();
+        servoPins[i] = -1;
         return;
       }
     }

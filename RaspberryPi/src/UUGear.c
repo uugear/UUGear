@@ -182,6 +182,13 @@ UUGearDevice attachUUGearDevice (char *id)
 	return dev;
 }
 
+void sendMessageWithoutParameter(mqd_t in, int msgType, int clientId, int fd)
+{
+	char buffer[MAX_MSG_SIZE + 1];
+	sprintf (buffer,"%d%s%d%s%d", msgType, MSG_PART_SEPARATOR, clientId, MSG_PART_SEPARATOR, fd);
+	ASSERT_TRUE (0 <= mq_send (in, buffer, strlen (buffer), 0));
+}
+
 void sendMessage(mqd_t in, int msgType, int clientId, int fd, int pin)
 {
 	char buffer[MAX_MSG_SIZE + 1];
@@ -347,6 +354,11 @@ void detachUUGearDevice (UUGearDevice *dev)
 	char queueName[strlen (RESPONSE_QUEUE_PREFIX) + 4];
 	sprintf (queueName, "%s%d", RESPONSE_QUEUE_PREFIX, dev->clientId);
 	mq_unlink (queueName);
+}
+
+void resetUUGearDevice(UUGearDevice *dev)
+{
+	sendMessageWithoutParameter(dev->in, MSG_RESET_DEVICE, dev->clientId, dev->fd);
 }
 
 void cleanupUUGear ()
