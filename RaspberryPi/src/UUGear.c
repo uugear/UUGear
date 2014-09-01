@@ -78,6 +78,10 @@ void setupUUGear ()
 			default:
 				fflush (NULL);
 				waitpid (pid, &status, 0);
+				while ((mqd_t)-1 == mq_open (REQUEST_QUEUE_NAME, O_WRONLY))
+				{
+					usleep (100000);
+				}
 			break;
 		}
 	}
