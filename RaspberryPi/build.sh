@@ -45,6 +45,8 @@ cc -L$TARGET_DIR -Wall ReadDHT11.c -o $TARGET_DIR/ReadDHT11 -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall ReadSR04.c -o $TARGET_DIR/ReadSR04 -lUUGear -lrt
 
+cc -L$TARGET_DIR -Wall ControlServo.c -o $TARGET_DIR/ControlServo -lUUGear -lrt
+
 cd $CURRENT_DIR
 
 echo "Copying examples in Python..."
