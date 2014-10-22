@@ -14,8 +14,8 @@ cd src
 
 echo "Building src..."
 
-cc -o $TARGET_DIR/UUGearDaemon UUGearDaemon.c serial.c -lrt
-cc -o $TARGET_DIR/UUGear.o -c -Wall -Werror -fPIC UUGear.c 
+cc -o $TARGET_DIR/UUGearDaemon UUGearDaemon.c serial.c -lrt -lpthread
+cc -o $TARGET_DIR/UUGear.o -c -Wall -Werror -fPIC UUGear.c
 cc -shared -o $TARGET_DIR/libUUGear.so $TARGET_DIR/UUGear.o -lrt
 cc -o $TARGET_DIR/SocketBroker SocketBroker.c UUGear.c -lrt
 
