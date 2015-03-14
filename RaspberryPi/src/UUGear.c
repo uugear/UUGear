@@ -327,7 +327,7 @@ void detachServo(UUGearDevice *dev, int pin)
 	sendMessage(dev->in, MSG_SERVO_DETACH, dev->clientId, dev->fd, pin);
 }
 
-int readDHT11(UUGearDevice *dev, int pin)
+int readDHT(UUGearDevice *dev, int pin)
 {
 	sendMessage(dev->in, MSG_READ_DHT11, dev->clientId, dev->fd, pin);
 	int errorCode = 0;

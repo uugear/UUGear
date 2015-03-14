@@ -25,7 +25,7 @@ $functionMap = [
 'readServo'				=> [ 'request' => 27,	'return' => DATA_TYPE_INTEGER,	'paramCount' => 2, 'paramType1' => DATA_TYPE_STRING, 'paramType2' => DATA_TYPE_INTEGER ],
 'detachServo'			=> [ 'request' => 28,	'return' => DATA_TYPE_VOID,		'paramCount' => 2, 'paramType1' => DATA_TYPE_STRING, 'paramType2' => DATA_TYPE_INTEGER ],
 
-'readDHT11'				=> [ 'request' => 41,	'return' => DATA_TYPE_INTEGER,	'paramCount' => 2, 'paramType1' => DATA_TYPE_STRING, 'paramType2' => DATA_TYPE_INTEGER ],
+'readDHT'				=> [ 'request' => 41,	'return' => DATA_TYPE_INTEGER,	'paramCount' => 2, 'paramType1' => DATA_TYPE_STRING, 'paramType2' => DATA_TYPE_INTEGER ],
 'readSR04'				=> [ 'request' => 42,	'return' => DATA_TYPE_FLOAT,	'paramCount' => 3, 'paramType1' => DATA_TYPE_STRING, 'paramType2' => DATA_TYPE_INTEGER, 'paramType3' => DATA_TYPE_INTEGER ],
 
 ];

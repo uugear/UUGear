@@ -336,7 +336,7 @@ void processCommand(String cmd) {
       cmdDetachServo(cmd);
       break;
     case 0x50:
-      cmdReadDHT11(cmd);
+      cmdReadDHT(cmd);
       break;
     case 0x51:
       cmdReadSR04(cmd);
@@ -523,9 +523,9 @@ void cmdDetachServo(String cmd) {
   }
 }
 
-// command to read DHT11 sensor
+// command to read DHT11/22 sensor
 // example: 55 50 04 01 0D 0A
-void cmdReadDHT11(String cmd) {
+void cmdReadDHT(String cmd) {
   if (cmd.length() > 5) {
     byte pin = cmd.charAt(2);
     byte clientId = cmd.charAt(3);
@@ -534,6 +534,9 @@ void cmdReadDHT11(String cmd) {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
     delay(18);
+    
+    // make sure no interrupts during the reading
+    noInterrupts();
 
     // pull up to receive data
     pinMode(pin, INPUT);
@@ -544,10 +547,11 @@ void cmdReadDHT11(String cmd) {
     // the following 80 edges are raising and falling, repeat 40 times, as 40 bits
     // none of the edges should let you wait longer than 80us
     unsigned long startTime;
-    word rawHumidity;
-    word rawTemperature;
-    word data;
-    for (char i = -3; i < 80; i ++) {
+    word buf = 0;
+    uint8_t data[5];
+    data[0] = data[1] = data[2] = data[3] = data[4] = 0;
+    
+    for (char i = -3, j = 0; i < 80; i ++) {
       byte age = 0;
       startTime = micros();
       // wait until expected edge shows up, response -1 for timeout
@@ -563,25 +567,24 @@ void cmdReadDHT11(String cmd) {
       }
       // save the bit (zero bit never be longer than 30us)
       if (i >= 0 && (i & 1)) {
-        data <<= 1;
+        buf <<= 1;
         if (age > 30) {
-          data |= 1;
+          buf |= 1;
         }
       }
-      // save the raw humidity and raw temperature
-      if (i == 31) {
-        rawHumidity = data;
-      } 
-      else if (i == 63) {
-        rawTemperature = data;
-        data = 0;
+      // save the raw data, byte by byte
+      if (i > 0 && (i + 1) % 16 == 0) {
+        data[j] = buf & 0xFF;
+        j ++;
+        buf = 0;
       }
     }
+    
+    // allow interrupts now
+    interrupts();
 
     // verify the checksum, response -2 for failure
-    byte humidity = rawHumidity >> 8;
-    byte temperature = rawTemperature >> 8;
-    if ((byte)(((byte)rawHumidity) + humidity + ((byte)rawTemperature) + temperature) != data) {
+    if ((0xFF & (data[0] + data[1] + data[2] + data[3])) != data[4]) {
       Serial.write(RESPONSE_START_CHAR);
       Serial.write(clientId);
       Serial.print("-2");
@@ -590,7 +593,7 @@ void cmdReadDHT11(String cmd) {
     }
 
     // response with the result
-    int result = (humidity << 8) + temperature;
+    long result = ((long)data[0] << 24) + ((long)data[1] << 16) + ((long)data[2] << 8) + data[3];    
     Serial.write(RESPONSE_START_CHAR);
     Serial.write(clientId);
     Serial.print(result);
@@ -605,6 +608,8 @@ void cmdReadSR04(String cmd) {
     byte trigPin = cmd.charAt(2);
     byte echoPin = cmd.charAt(3);
     byte clientId = cmd.charAt(4);
+    // make sure no interrupts during the measuring
+    noInterrupts();
     // trigger the sensor
     pinMode(trigPin, OUTPUT);
     digitalWrite(trigPin, LOW); 
@@ -618,6 +623,8 @@ void cmdReadSR04(String cmd) {
     unsigned long start = micros();
     while (digitalRead(echoPin) == HIGH) {}
     unsigned long duration = micros() - start;
+    // allow interrupts now
+    interrupts();
     // calculate the distance in cm
     float result = (float)duration / 58.2;
     Serial.write(RESPONSE_START_CHAR);

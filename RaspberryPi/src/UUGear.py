@@ -81,8 +81,8 @@ uugearlib.readServo.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 uugearlib.detachServo.restype = None
 uugearlib.detachServo.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
-uugearlib.readDHT11.restype = c_int
-uugearlib.readDHT11.argtypes = [POINTER(UUGearDeviceProfile), c_int]
+uugearlib.readDHT.restype = c_int
+uugearlib.readDHT.argtypes = [POINTER(UUGearDeviceProfile), c_int]
 
 uugearlib.readSR04.restype = c_float
 uugearlib.readSR04.argtypes = [POINTER(UUGearDeviceProfile), c_int, c_int]
@@ -168,9 +168,9 @@ class UUGearDevice(object):
 		if self.isValid():
 			uugearlib.detachServo(byref(self.devProfile), pin)
 
-	def readDHT11(self, pin):
+	def readDHT(self, pin):
 		if self.isValid():
-			return uugearlib.readDHT11(byref(self.devProfile), pin)
+			return uugearlib.readDHT(byref(self.devProfile), pin)
 		else:
 			return -1
 			

@@ -41,7 +41,7 @@ cc -L$TARGET_DIR -Wall VoltageMeasurement.c -o $TARGET_DIR/VoltageMeasurement -l
 
 cc -L$TARGET_DIR -Wall ReadSpeed.c -o $TARGET_DIR/ReadSpeed -lUUGear -lrt
 
-cc -L$TARGET_DIR -Wall ReadDHT11.c -o $TARGET_DIR/ReadDHT11 -lUUGear -lrt
+cc -L$TARGET_DIR -Wall ReadDHT.c -o $TARGET_DIR/ReadDHT -lUUGear -lrt
 
 cc -L$TARGET_DIR -Wall ReadSR04.c -o $TARGET_DIR/ReadSR04 -lUUGear -lrt
 

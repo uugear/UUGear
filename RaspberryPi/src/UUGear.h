@@ -114,19 +114,24 @@ extern int readServo(UUGearDevice *dev, int pin);
 extern void detachServo(UUGearDevice *dev, int pin);
 
 /*
- * Read humidity and temperature values from DHT11 sensor
+ * Read humidity and temperature values from DHT11 or DHT22 sensor
  *
  * parameters:
  *	dev is the pointer of the device struct
- *	pin is the digital pin that connects to the DATA wire of DHT11
+ *	pin is the digital pin that connects to the DATA wire of DHT sensor
  *
  * returns:
- *	integer that lowest byte is temperature while higher byte is humidity
- *	-1 for timeout
- *	-2 for checksum error
- *	-3 for communication error (please check /var/log/syslog)
+ *	integer (4 bytes) that contains both humidity and temperature data in order:
+ *    1 byte humidity integer data
+ *    1 byte humidity decimal data
+ *    1 byte temperature integer data
+ *    1 byte temperature decimal data
+ *  if any error hanppens, return a negative value:
+ *	  -1 for timeout
+ *	  -2 for checksum error
+ *	  -3 for communication error (please check /var/log/syslog)
  */
-extern int readDHT11(UUGearDevice *dev, int pin);
+extern int readDHT(UUGearDevice *dev, int pin);
 
 /**
  * Read distance value (in cm) from HC-SR04 sensor

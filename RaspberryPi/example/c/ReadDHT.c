@@ -10,7 +10,9 @@
 
 #include "../../src/UUGear.h"
 
-
+/* 
+ This example read humidity and temperature from DHT11 or DHT22 sensor
+*/
 int main(int argc, char **argv)
 {
 	setupUUGear();
@@ -25,10 +27,17 @@ int main(int argc, char **argv)
 		for (i = 0; i < 200; i ++)
 		{
 			time_t mytime = time(NULL);
-			int value = readDHT11(&dev, 4);
+			int data = readDHT(&dev, 4);
+			float humidity = ((float)(data >> 16)) / 10;
+			float temperature = ((float)(data & 0x7FFF)) / 10;
+			if (data & 0x8000)
+			{
+				temperature = -temperature;
+			}
 		    printf(ctime(&mytime));
-			printf("H: %d%%  T: %dC\n", value >> 8, value & 0xFF);
-			sleep(1);
+			printf("Humidity: %.1f%%  Temperature: %.1fC\n", humidity, temperature);
+			// do not read too frequently
+			sleep(2);
 		}
 		detachUUGearDevice (&dev);
 	}
