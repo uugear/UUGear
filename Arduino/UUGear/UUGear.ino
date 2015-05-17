@@ -44,6 +44,8 @@
 
 #define SERVO_MAX_NUMBER  12
 
+/* Not all Arduino boards support script engine, so we disable it default */
+//#define __SCRIPT_ENGINE_ENABLED__
 #define SCRIPT_CHANNEL_NUMBER  2
 #define SCRIPT_INPUT_LENGTH    64
 #define SCRIPT_OUTPUT_LENGTH   192
@@ -54,6 +56,7 @@ int servoPins[SERVO_MAX_NUMBER];
 String cmdBuf = "";
 int cmdEndStrLen = strlen(COMMAND_END_STRING);
 
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
 typedef struct {
   byte clientId;
   byte input[SCRIPT_INPUT_LENGTH];
@@ -74,6 +77,7 @@ ScriptChannel scriptChannels[SCRIPT_CHANNEL_NUMBER];
 
 volatile unsigned long lastMicros;
 unsigned long elapsedMicros;
+#endif
 
 // declare reset function
 void(* resetDevice) (void) = 0;
@@ -95,6 +99,7 @@ void setup() {
     servoPins[i] = -1;
   }
 
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
   // initialize mini script engine
   for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
     scriptChannels[i].inputIndex = -1;
@@ -116,10 +121,12 @@ void setup() {
   sei();
 
   lastMicros = micros();
+#endif
 
   //Serial.println(getID());
 }
 
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
 // timer 2 interrupt handler
 ISR(TIMER2_COMPA_vect) {
   for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
@@ -140,8 +147,10 @@ ISR(TIMER2_COMPA_vect) {
     }
   }
 }
+#endif
 
 void loop() {
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
   // calculate the elapsed time since last circle
   unsigned long currentMicros = micros();
   elapsedMicros = currentMicros > lastMicros ? currentMicros - lastMicros : 4294967295 - lastMicros + currentMicros;
@@ -149,6 +158,7 @@ void loop() {
 
   // process mini scripts
   processScripts();
+#endif
 
   // listen to incoming commands
   int len = Serial.available();
@@ -219,6 +229,7 @@ void logAsHex(String str) {
   Serial.println(hex);
 }
 
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
 // process scripts
 void processScripts() {
   for (int i = 0; i < SCRIPT_CHANNEL_NUMBER; i ++) {
@@ -289,6 +300,7 @@ void processScripts() {
     }
   }
 }
+#endif
 
 // process the command
 void processCommand(String cmd) {
@@ -342,7 +354,9 @@ void processCommand(String cmd) {
       cmdReadSR04(cmd);
       break;
     case 0xF0:
+#if defined(__SCRIPT_ENGINE_ENABLED__) 
       cmdScript(cmd);
+#endif
       break;
     case 0xFF:
       resetDevice();
@@ -634,6 +648,7 @@ void cmdReadSR04(String cmd) {
   }
 }
 
+#if defined(__SCRIPT_ENGINE_ENABLED__)
 // command to run mini script
 // example: 55 F0 89 BD 84 40 88 BD 84 40 89 BD 84 40 88 01 0D 0A
 void cmdScript(String cmd) {
@@ -668,3 +683,4 @@ void cmdScript(String cmd) {
     Serial.print(RESPONSE_END_STRING);
   }
 }
+#endif
