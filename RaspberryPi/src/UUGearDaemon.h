@@ -29,7 +29,7 @@
 
 #define DAEMON_NAME "uugear_daemon"
 
-/* The daemon may need root privileges to access your Arduino devices */
+/* The daemon may need root privileges to access Arduino and message queue */
 #define RUN_AS_USER "root"
 
 #define EXIT_SUCCESS 0
