@@ -29,7 +29,8 @@
 
 #define DAEMON_NAME "uugear_daemon"
 
-#define RUN_AS_USER "pi"
+/* The daemon may need root privileges to access your Arduino devices */
+#define RUN_AS_USER "root"
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
