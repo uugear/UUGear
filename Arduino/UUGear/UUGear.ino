@@ -572,6 +572,8 @@ void cmdReadDHT(String cmd) {
       while (digitalRead(pin) == (i & 1) ? HIGH : LOW) {
         age = micros() - startTime;
         if (age > 80) {
+          // allow interrupts now
+          interrupts();
           Serial.write(RESPONSE_START_CHAR);
           Serial.write(clientId);
           Serial.print("-1");
