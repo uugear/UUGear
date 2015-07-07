@@ -162,14 +162,7 @@ UUGearDevice internalAttachDevice (char *id, int printError)
     {
     	buffer[bytes] = 0;
     	dev.fd = atoi (buffer);
-    	if (dev.fd == -1)
-    	{
-    		printLog ("Device has been attached already.\n");
-    	}
-    	else
-    	{
-			printLog ("UUGear device found. fd=%d\n", dev.fd);
-		}
+		printLog ("UUGear device found. fd=%d\n", dev.fd);
     }
 	return dev;
 }

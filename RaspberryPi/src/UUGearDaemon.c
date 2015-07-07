@@ -282,7 +282,6 @@ void *deviceOpener(void *arg)
 						}
 						syslog (LOG_INFO, "Received response from %s(fd=%d): %s", devOpen->devName, devOpen->fd, buf);
 						
-						// if cid != clientId, means trying to open the same device twice, which is not allowed
 						if (cid == clientId)
 						{
 							// send back the response to client
@@ -290,8 +289,10 @@ void *deviceOpener(void *arg)
 						}
 						else
 						{
-							syslog (LOG_INFO, "Device could not be attached twice, returning fd=-1");
-							responseToClient (cid, "-1");
+							// If cid != clientId, it could be one of two cases: either trying to open the same device twice,
+							// or another opener broadcasts CMD_GET_DEVICE_ID command to find a different device.
+							// It seems not possible to distinguish these two cases, so the best way is not to response anything.
+							syslog (LOG_INFO, "Receive response from another client, ignoring...");
 						}
 					}
 	  			}
