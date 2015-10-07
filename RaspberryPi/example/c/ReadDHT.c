@@ -29,7 +29,15 @@ int main(int argc, char **argv)
 			time_t mytime = time(NULL);
 			int data = readDHT(&dev, 4);
 			float humidity = ((float)(data >> 16)) / 10;
+			if ( humidity > 100 )
+			{
+				humidity = (data >> 24);	// for DHT11
+			}
 			float temperature = ((float)(data & 0x7FFF)) / 10;
+			if ( temperature > 125 ) 
+			{
+				temperature = ((data & 0x7F00) >> 8);	// for DHT11
+			}
 			if (data & 0x8000)
 			{
 				temperature = -temperature;
